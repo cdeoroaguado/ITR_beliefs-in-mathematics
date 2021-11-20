@@ -46,7 +46,7 @@ datos_pais %>%
             max = max(rules_and_proc),
             riq = IQR(rules_and_proc)) 
 
-# result
+# result rules_and_proc
 # PROGRAMA       n media    sd median   min   max   riq
 # Licenciado   213 10.1  0.740   10.1   7.9    12 0.800
 # Normalista   405  9.98 1.11    10.2   7.9    12 1.4 
@@ -78,7 +78,7 @@ datos_pais %>%
             max = max(process_of_inquiry),
             riq = IQR(process_of_inquiry)) 
 
-# result
+# result process_of_inquiry
 # PROGRAMA       n media    sd median   min   max   riq
 # Licenciado   213 10.4  0.866   10.2     8  11.7   0.9
 # Normalista   405  9.82 1.01     9.9     8  11.7   1.4
@@ -110,7 +110,7 @@ datos_pais %>%
             max = max(teacher_direction),
             riq = IQR(teacher_direction)) 
 
-# result
+# result teacher_direction
 # PROGRAMA       n media    sd median   min   max   riq
 # Licenciado   213  9.94 0.827   10     7.8  12.5   0.9
 # Normalista   405 10.0  1.07    10.2   7.8  13     1 
@@ -142,7 +142,7 @@ datos_pais %>%
             max = max(active_learning),
             riq = IQR(active_learning))
 
-# result
+# result active_learning
 # PROGRAMA       n media    sd median   min   max   riq
 # Licenciado   213 10.3  0.868   10.3     8  11.8 0.800
 # Normalista   405  9.83 1.04    10       8  11.8 1.4 
@@ -174,7 +174,7 @@ datos_pais %>%
             max = max(fixed_ability),
             riq = IQR(fixed_ability))
 
-# result
+# result fixed_ability
 # PROGRAMA       n media    sd median   min   max   riq
 # Licenciado   213  9.98 0.869   10.1   7.9  12.5   1  
 # Normalista   405 10.0  1.06    10.2   7.9  12.5   1.1
@@ -206,7 +206,7 @@ datos_pais %>%
             max = max(Prep_for_teach_math),
             riq = IQR(Prep_for_teach_math))
 
-# result
+# result Preparedness for Teaching Mathematics
 # PROGRAMA       n media    sd median   min   max   riq
 # Licenciado   213 10.2  0.807   10.2   8.1  11.6 0.900
 # Normalista   405  9.88 1.07    10     8.1  11.6 1.5 
@@ -238,7 +238,7 @@ datos_pais %>%
             max = max(quality_of_instr),
             riq = IQR(quality_of_instr))
 
-# result
+# result Quality of Instruction
 # PROGRAMA       n media    sd median   min   max   riq
 # Licenciado   213 10.2  0.807   10.2   8.1  11.6 0.900
 # Normalista   405  9.88 1.07    10     8.1  11.6 1.5
