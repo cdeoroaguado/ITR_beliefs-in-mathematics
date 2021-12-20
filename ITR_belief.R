@@ -111,7 +111,7 @@ wilcox.test(datos_licenciado$rules_and_proc,
 # there aren't statistically significant differences 
 
 # effect size non-parametric 
-r1=rank_biserial(datos_normalista$rules_and_proc,
+r1 <- rank_biserial(datos_normalista$rules_and_proc,
               datos_licenciado$rules_and_proc)
 
 # result
@@ -152,7 +152,7 @@ t.test(x = datos_licenciado$rules_and_proc,
        mu = 0, var.equal = FALSE, 
        conf.level = 0.95)
 # t = 1.1914, df = 582.44, p-value = 0.234
-# there aren't statistically significant differences in media
+# there aren't statistically significant differences in average
 
 # effect size: rules and proc
 
@@ -282,7 +282,7 @@ t.test(x = datos_licenciado$process_of_inquiry,
        conf.level = 0.95)
 
 # t = 6.9792, df = 491.54, p-value = 9.654e-12
-# there are statistically significant differences in media
+# there are statistically significant differences in average
 
 # effect size: process of inquiry
 
@@ -410,7 +410,7 @@ t.test(x = datos_normalista$teacher_direction,
        mu = 0, var.equal = FALSE, 
        conf.level = 0.95)
 # t = 1.31, df = 532.37, p-value = 0.1908
-# there aren't statistically significant differences in media
+# there aren't statistically significant differences in average
 
 # effect size: Teacher Direction
 
@@ -457,7 +457,7 @@ lillie.test(datos_pais$active_learning)
 
 qqnorm(datos_pais$active_learning, las=1, pch=18, 
        main="Active Learning de los profesores", font.main=1,
-       xlab="Cuantiles teóricos", ylab="Cuantiles muestrales") 
+       xlab="Theoretical quantiles", ylab="Sample quantiles") 
 qqline(datos_pais$active_learning)
 
 shapiro.test(datos_normalista$active_learning)
@@ -469,7 +469,7 @@ lillie.test(datos_normalista$active_learning)
 
 qqnorm(datos_normalista$active_learning, las=1, pch=18, 
        main="Active Learning de los normalistas", font.main=1,
-       xlab="Cuantiles teóricos", ylab="Cuantiles muestrales") 
+       xlab="Theoretical quantiles", ylab="Sample quantiles") 
 qqline(datos_normalista$active_learning)
 
 shapiro.test(datos_licenciado$active_learning)
@@ -481,7 +481,7 @@ lillie.test(datos_licenciado$active_learning)
 
 qqnorm(datos_licenciado$active_learning, las=1, pch=18, 
        main="Active Learning de los licenciados", font.main=1,
-       xlab="Cuantiles teóricos", ylab="Cuantiles muestrales") 
+       xlab="Theoretical quantiles", ylab="Sample quantiles") 
 qqline(datos_licenciado$active_learning)
 
 # result of the normal distribution
@@ -536,7 +536,7 @@ t.test(x = datos_licenciado$active_learning,
        conf.level = 0.95)
 
 # t = 6.0243, df = 502.65, p-value = 3.284e-09
-# # there aren't statistically significant differences in media
+# there aren't statistically significant differences in average
 
 # effect size: Active Learning
 
@@ -583,62 +583,88 @@ lillie.test(datos_pais$fixed_ability)
 
 qqnorm(datos_pais$fixed_ability, las=1, pch=18, 
        main="Fixed Ability de los profesores", font.main=1,
-       xlab="Cuantiles teóricos", ylab="Cuantiles muestrales") 
+       xlab="Theoretical quantiles", ylab="Sample quantiles") 
 qqline(datos_pais$fixed_ability)
 
 shapiro.test(datos_normalista$fixed_ability)
+# W = 0.92111, p-value = 9.538e-14
 ks.test(scale(datos_normalista$fixed_ability), "pnorm")
+# D = 0.14597, p-value = 6.392e-08
 lillie.test(datos_normalista$fixed_ability)
+# D = 0.14597, p-value < 2.2e-16
 
 qqnorm(datos_normalista$fixed_ability, las=1, pch=18, 
        main="Fixed Ability de los normalistas", font.main=1,
-       xlab="Cuantiles teóricos", ylab="Cuantiles muestrales") 
+       xlab="Theoretical quantiles", ylab="Sample quantiles") 
 qqline(datos_normalista$fixed_ability)
 
 shapiro.test(datos_licenciado$fixed_ability)
+# W = 0.94703, p-value = 4.84e-07
 ks.test(scale(datos_licenciado$fixed_ability), "pnorm")
+# D = 0.086804, p-value = 0.08072
 lillie.test(datos_licenciado$fixed_ability)
+# D = 0.086804, p-value = 0.000509
 
 qqnorm(datos_licenciado$fixed_ability, las=1, pch=18, 
        main="Fixed Ability de los licenciados", font.main=1,
-       xlab="Cuantiles teóricos", ylab="Cuantiles muestrales") 
+       xlab="Theoretical quantiles", ylab="Sample quantiles") 
 qqline(datos_licenciado$fixed_ability)
+
+# result of the normal distribution
+# the data don't have the behavior of a normal distribution
 
 # non-parametric test
 wilcox.test(datos_licenciado$fixed_ability,
             datos_normalista$fixed_ability,paired = F,
             exact = F,correct = T,conf.int = 0.95)
+# W = 40408, p-value = 0.1958
+# there aren't statistically significant differences
 
 # effect size non-parametric 
 r5 <- rank_biserial(datos_normalista$fixed_ability,
                     datos_licenciado$fixed_ability)
+# r (rank biserial) |        95% CI
+# 0.06              | [-0.03, 0.16]
 
-interpret_r(r5$r_rank_biserial, rules = "cohen1988")
+interpret_r(r5$r_rank_biserial, rules = "funder2019")
+# "very small"
 
 # parametric test
 
 # homoscedasticity test
 var.test(x = datos_licenciado$fixed_ability,
          y = datos_normalista$fixed_ability)
+# F = 0.67057, num df = 212, denom df = 404, p-value = 0.001196
 
 fligner.test(fixed_ability ~ PROGRAMA, data= datos_pais)
+# Fligner-Killeen:med chi-squared = 5.3318, df = 1, p-value = 0.02094
 
 leveneTest(fixed_ability ~ factor(PROGRAMA), data = datos_pais,
            center = "median")
+# Df F value  Pr(>F)  
+# group   1  6.0567 0.01413 *
+#   616
 
 bartlett.test(list(datos_licenciado$fixed_ability,
                    datos_normalista$fixed_ability))
+# Bartlett's K-squared = 10.576, df = 1, p-value = 0.001146
 
-t.test(x = datos_licenciado$fixed_ability,
-       y = datos_normalista$fixed_ability,
+# result of homoscedasticity test
+# there are statistically significant differences in variances
+
+t.test(x = datos_normalista$fixed_ability,
+       y = datos_licenciado$fixed_ability,
        alternative = "two.sided", 
        mu = 0, var.equal = FALSE, 
        conf.level = 0.95)
+# t = 0.38241, df = 510.25, p-value = 0.7023
+# there aren't statistically significant differences in average
 
-# tamaño del efecto Fixed Ability
+# effect size: Fixed Ability
 
 cohen.d(formula = fixed_ability ~ PROGRAMA,
         data= datos_pais, paired = FALSE)
+# d estimate: -0.03043892 (negligible)
 
 # Preparedness for Teaching Mathematics ----
 Prep_for_teach_math <- dic_creencias %>% 
@@ -679,67 +705,96 @@ lillie.test(datos_pais$Prep_for_teach_math)
 
 qqnorm(datos_pais$Prep_for_teach_math, las=1, pch=18, 
        main="Preparedness for Teaching Mathematics de los profesores", font.main=1,
-       xlab="Cuantiles teóricos", ylab="Cuantiles muestrales") 
+       xlab="Theoretical quantiles", ylab="Sample quantiles") 
 qqline(datos_pais$Prep_for_teach_math)
 
 shapiro.test(datos_normalista$Prep_for_teach_math)
+# W = 0.93088, p-value = 9.588e-13
 ks.test(scale(datos_normalista$Prep_for_teach_math), "pnorm")
+# D = 0.10295, p-value = 0.0003741
 lillie.test(datos_normalista$Prep_for_teach_math)
+# D = 0.10295, p-value = 4.235e-11
 
 qqnorm(datos_normalista$Prep_for_teach_math, las=1, pch=18, 
        main="Preparedness for Teaching Mathematics de los normalistas", font.main=1,
-       xlab="Cuantiles teóricos", ylab="Cuantiles muestrales") 
+       xlab="Theoretical quantiles", ylab="Sample quantiles") 
 qqline(datos_normalista$Prep_for_teach_math)
 
 shapiro.test(datos_licenciado$Prep_for_teach_math)
+# W = 0.93266, p-value = 2.487e-08
 ks.test(scale(datos_licenciado$Prep_for_teach_math), "pnorm")
+# D = 0.11223, p-value = 0.009352
 lillie.test(datos_licenciado$Prep_for_teach_math)
+# D = 0.11223, p-value = 7.407e-07
 
 qqnorm(datos_licenciado$Prep_for_teach_math, las=1, pch=18, 
        main="Preparedness for Teaching Mathematics de los licenciados", font.main=1,
-       xlab="Cuantiles teóricos", ylab="Cuantiles muestrales") 
+       xlab="Theoretical quantiles", ylab="Sample quantiles") 
 qqline(datos_licenciado$Prep_for_teach_math)
+
+# result of the normal distribution
+# the data don't have the behavior of a normal distribution
 
 # non-parametric test
 wilcox.test(datos_licenciado$Prep_for_teach_math,
             datos_normalista$Prep_for_teach_math,paired = F,
             exact = F,correct = T,conf.int = 0.95)
+# W = 50018, p-value = 0.001075
+# there are statistically significant differences
 
 # effect size non-parametric 
-r6 <- rank_biserial(datos_normalista$Prep_for_teach_math,
-                    datos_licenciado$Prep_for_teach_math)
+r6 <- rank_biserial(datos_licenciado$Prep_for_teach_math,
+                    datos_normalista$Prep_for_teach_math)
+# r (rank biserial) |       95% CI
+# 0.16              | [0.07, 0.25]
 
-interpret_r(r6$r_rank_biserial, rules = "cohen1988")
-# [1] "small"
+interpret_r(r6$r_rank_biserial, rules = "funder2019")
+# "small"
 
 # parametric test
 
 # homoscedasticity test
 var.test(x = datos_licenciado$Prep_for_teach_math,
          y = datos_normalista$Prep_for_teach_math)
+# result
+# F = 0.56646, num df = 212, denom df = 404, p-value = 5.086e-06
 
 fligner.test(Prep_for_teach_math ~ PROGRAMA, data= datos_pais)
+# result
+# Fligner-Killeen:med chi-squared = 14.334, df = 1, p-value = 0.0001531
 
 leveneTest(Prep_for_teach_math ~ factor(PROGRAMA), data = datos_pais,
            center = "median")
+# result
+# Df F value    Pr(>F)    
+# group   1  25.811 4.999e-07 ***
+#   616 
 
 bartlett.test(list(datos_licenciado$Prep_for_teach_math,
                    datos_normalista$Prep_for_teach_math))
+# result
+# Bartlett's K-squared = 20.915, df = 1, p-value = 4.802e-06
+
+# result of homoscedasticity test
+# there are statistically significant differences in variances
 
 t.test(x = datos_licenciado$Prep_for_teach_math,
        y = datos_normalista$Prep_for_teach_math,
        alternative = "two.sided", 
        mu = 0, var.equal = FALSE, 
        conf.level = 0.95)
+# t = 4.293, df = 542.85, p-value = 2.088e-05
+# there are statistically significant differences in average
 
-# tamaño del efecto Preparedness for Teaching Mathematics
+# effect size: Preparedness for Teaching Mathematics
 
 cohen.d(formula = Prep_for_teach_math ~ PROGRAMA,
         data= datos_pais, paired = FALSE)
+# d estimate: 0.3333059 (small)
 
 # Quality of Instruction ----
 quality_of_instr <- dic_creencias %>% 
-  filter(subdominio == "Preparedness for Teaching Mathematics") %>% 
+  filter(subdominio == "Quality of Instruction") %>% 
   dplyr::select(idi) %>% 
   pull(idi) %>% 
   as.character()
@@ -762,12 +817,12 @@ datos_pais %>%
             median = median(quality_of_instr),
             min = min(quality_of_instr),
             max = max(quality_of_instr),
-            riq = IQR(quality_of_instr))
+            riq = IQR(quality_of_instr)) -> qi
 
 # result
 # PROGRAMA       n media    sd median   min   max   riq
-# Licenciado   213 10.2  0.807   10.2   8.1  11.6 0.900
-# Normalista   405  9.88 1.07    10     8.1  11.6 1.5
+# Licenciado   213 10.1  0.771   10     8.3  11.8 0.800
+# Normalista   405  9.97 1.09    10.1   8.3  11.8 1.70 
 
 # statistical inference
 shapiro.test(datos_pais$quality_of_instr)
@@ -776,61 +831,88 @@ lillie.test(datos_pais$quality_of_instr)
 
 qqnorm(datos_pais$quality_of_instr, las=1, pch=18, 
        main="Quality of Instruction de los profesores", font.main=1,
-       xlab="Cuantiles teóricos", ylab="Cuantiles muestrales") 
+       xlab="Theoretical quantiles", ylab="Sample quantiles") 
 qqline(datos_pais$quality_of_instr)
 
 shapiro.test(datos_normalista$quality_of_instr)
+# W = 0.93809, p-value = 6.093e-12
 ks.test(scale(datos_normalista$quality_of_instr), "pnorm")
+# D = 0.10967, p-value = 0.0001174
 lillie.test(datos_normalista$quality_of_instr)
+# D = 0.10967, p-value = 1.096e-12
 
 qqnorm(datos_normalista$quality_of_instr, las=1, pch=18, 
        main="Quality of Instruction de los normalistas", font.main=1,
-       xlab="Cuantiles teóricos", ylab="Cuantiles muestrales") 
+       xlab="Theoretical quantiles", ylab="Sample quantiles") 
 qqline(datos_normalista$quality_of_instr)
 
 shapiro.test(datos_licenciado$quality_of_instr)
+# W = 0.94883, p-value = 7.235e-07
 ks.test(scale(datos_licenciado$quality_of_instr), "pnorm")
+# D = 0.10237, p-value = 0.02303
 lillie.test(datos_licenciado$quality_of_instr)
+# D = 0.10237, p-value = 1.177e-05
 
 qqnorm(datos_licenciado$quality_of_instr, las=1, pch=18, 
        main="Quality of Instruction de los licenciados", font.main=1,
-       xlab="Cuantiles teóricos", ylab="Cuantiles muestrales") 
+       xlab="Theoretical quantiles", ylab="Sample quantiles") 
 qqline(datos_licenciado$quality_of_instr)
+
+# result of the normal distribution
+# the data don't have the behavior of a normal distribution
 
 # non-parametric test
 wilcox.test(datos_licenciado$quality_of_instr,
             datos_normalista$quality_of_instr,paired = F,
             exact = F,correct = T,conf.int = 0.95)
+# W = 44532, p-value = 0.5063
+# there are statistically significant differences
 
 # effect size non-parametric 
-r7 <- rank_biserial(datos_normalista$quality_of_instr,
-                    datos_licenciado$quality_of_instr)
+r7 <- rank_biserial(datos_licenciado$quality_of_instr,
+                    datos_normalista$quality_of_instr)
+# r (rank biserial) |       95% CI
+# 0.03              | [-0.06, 0.13]
 
-
-interpret_r(r7$r_rank_biserial, rules = "cohen1988")
-
+interpret_r(r7$r_rank_biserial, rules = "funder2019")
+# "tiny"
 
 # parametric test
 
 # homoscedasticity test
 var.test(x = datos_licenciado$quality_of_instr,
          y = datos_normalista$quality_of_instr)
+# result
+# F = 0.49712, num df = 212, denom df = 404, p-value = 2.689e-08
 
 fligner.test(quality_of_instr ~ PROGRAMA, data= datos_pais)
+# result
+# Fligner-Killeen:med chi-squared = 26.72, df = 1, p-value = 2.352e-07
 
 leveneTest(quality_of_instr ~ factor(PROGRAMA), data = datos_pais,
            center = "median")
+# result 
+# Df F value    Pr(>F)    
+# group   1  43.712 8.253e-11 ***
+#   616
 
 bartlett.test(list(datos_licenciado$quality_of_instr,
                    datos_normalista$quality_of_instr))
+# result
+# Bartlett's K-squared = 31.053, df = 1, p-value = 2.511e-08
+
+# result of homoscedasticity test
+# there are statistically significant differences in variances
 
 t.test(x = datos_licenciado$quality_of_instr,
        y = datos_normalista$quality_of_instr,
        alternative = "two.sided", 
        mu = 0, var.equal = FALSE, 
        conf.level = 0.95)
+# t = 1.4767, df = 565.63, p-value = 0.1403
+# there aren't statistically significant differences in average
 
-# tamaño del efecto Quality of Instruction
-
+# effect size: Quality of Instruction
 cohen.d(formula = quality_of_instr ~ PROGRAMA,
         data= datos_pais, paired = FALSE)
+# d estimate: 0.1125414 (negligible)
