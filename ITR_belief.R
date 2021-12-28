@@ -14,7 +14,6 @@ datos_pais <- read_excel("Doc_Evelyn/itr_creencias/Datos_TEDS_M_Colombia.xlsx",
 dic_creencias <- read_excel("Doc_Evelyn/itr_creencias/Datos_TEDS_M_Colombia.xlsx",
                             sheet = "dic")
 
-
 # subset data ----
 datos_pais %>%
   filter(PROGRAMA=="Normalista") -> datos_normalista
@@ -30,6 +29,106 @@ puntaje_rasch <- function(model,
   scores <- round(sd * scale(fscores) + mean,1) 
   return(scores)
 }
+
+# age ----
+datos_pais %>%
+  summarise(n = length(MFA001),
+            media = mean(MFA001),
+            sd = sd(MFA001),
+            mediana = median(MFA001),
+            min = min(MFA001),
+            max = max(MFA001))
+
+# n media    sd mediana   min   max
+# 1   618  23.1  6.68      21    16    55
+
+datos_pais %>%
+  group_by(PROGRAMA)%>%
+  summarise(n = length(MFA001),
+            media = mean(MFA001),
+            sd = sd(MFA001),
+            mediana = median(MFA001),
+            min = min(MFA001),
+            max = max(MFA001))
+
+# PROGRAMA       n media    sd mediana   min   max
+# Licenciado   213  24.3  6.21      22    19    55
+# Normalista   405  22.4  6.82      19    16    51
+
+# statistical inference
+
+shapiro.test(datos_pais$MFA001)
+ks.test(scale(datos_pais$MFA001), "pnorm")
+lillie.test(datos_pais$MFA001)
+
+qqnorm(datos_pais$MFA001, las=1, pch=18, 
+       main="age of the teachers", font.main=1,
+       xlab="Theoretical quantiles", ylab="Sample quantiles") 
+qqline(datos_pais$MFA001)
+
+shapiro.test(datos_normalista$MFA001)
+# W = 0.7138, p-value < 2.2e-16
+ks.test(scale(datos_normalista$MFA001), "pnorm")
+# D = 0.27467, p-value < 2.2e-16
+lillie.test(datos_normalista$MFA001)
+# D = 0.27467, p-value < 2.2e-16
+
+qqnorm(datos_normalista$MFA001, las=1, pch=18, 
+       main="age of the normalists", font.main=1,
+       xlab="Theoretical quantiles", ylab="Sample quantiles") 
+qqline(datos_normalista$MFA001)
+
+shapiro.test(datos_licenciado$MFA001)
+# W = 0.69095, p-value < 2.2e-16
+ks.test(scale(datos_licenciado$MFA001), "pnorm")
+# D = 0.23531, p-value = 1.14e-10
+lillie.test(datos_licenciado$MFA001)
+# D = 0.23531, p-value < 2.2e-16
+
+qqnorm(datos_licenciado$MFA001, las=1, pch=18, 
+       main="age of the graduaded", font.main=1,
+       xlab="Theoretical quantiles", ylab="Sample quantiles") 
+qqline(datos_licenciado$MFA001)
+
+# result of the normal distribution
+# the data don't have the behavior of a normal distribution
+
+# non-parametric test
+wilcox.test(datos_licenciado$MFA001,
+            datos_normalista$MFA001,paired = F,
+            exact = F,correct = T,conf.int = 0.95)
+
+# W = 61924, p-value < 2.2e-16
+# result of the non-parametric test
+# there are statistically significant differences
+
+fligner.test(list(datos_licenciado$MFA001,datos_normalista$MFA001))
+
+leveneTest(MFA001 ~ PROGRAMA, data = datos_col, center = "median")
+
+var.test(x = datos_normalista$MFA001,
+         y = datos_licenciado$MFA001)
+
+bartlett.test(list(datos_normalista$MFA001,datos_licenciado$MFA001))
+
+t.test(x = datos_licenciado$MFA001,
+       y = datos_normalista$MFA001,
+       alternative = "two.sided", 
+       mu = 0, var.equal = TRUE, 
+       conf.level = 0.95)
+
+# gender ----
+
+datos_pais %>%
+  count(MFA002)%>%
+  mutate(P = n/sum(n)*100)
+
+d <-table(datos_pais$PROGRAMA,datos_pais$MFA002)
+(d[,1]/423)*100
+(d[,2]/195)*100
+
+chisq.test(d)
+#X-squared = 68.043, df = 1, p-value < 2.2e-16
 
 # Rules and Procedures ----
 rules_and_proc <- dic_creencias %>% 
@@ -73,6 +172,12 @@ qqnorm(datos_pais$rules_and_proc, las=1, pch=18,
        main="rules and process of the teachers", font.main=1,
        xlab="Theoretical quantiles", ylab="Sample quantiles") 
 qqline(datos_pais$rules_and_proc)
+
+datos_pais %>%
+  filter(PROGRAMA=="Normalista") -> datos_normalista
+
+datos_pais %>%
+  filter(PROGRAMA=="Licenciado") -> datos_licenciado
 
 shapiro.test(datos_normalista$rules_and_proc)
 # W = 0.94623, p-value = 5.879e-11
@@ -160,6 +265,28 @@ cohen.d(formula = rules_and_proc ~ PROGRAMA,
         data= datos_pais, paired = FALSE)
 # d estimate: 0.08942412 (negligible)
 
+# percentage of rules and process ----
+datos_pais %>% 
+  dplyr::select(PROGRAMA, all_of(rules_and_proc)) %>%
+  mutate(MFD001A_d = ifelse(MFD001A == 6 | MFD001A == 5,1,0),
+         MFD001B_d = ifelse(MFD001B == 6 | MFD001B == 5,1,0),
+         MFD001E_d = ifelse(MFD001E == 6 | MFD001E == 5,1,0),
+         MFD001G_d = ifelse(MFD001G == 6 | MFD001G == 5,1,0),
+         MFD001K_d = ifelse(MFD001K == 6 | MFD001K == 5,1,0),
+         MFD001L_d = ifelse(MFD001L == 6 | MFD001L == 5,1,0)) -> datos_rp
+
+datos_rp %>% 
+  mutate(porc_rp = ((MFD001A_d+MFD001B_d+MFD001E_d+
+                       MFD001G_d+MFD001K_d+MFD001L_d)/6)*100) -> datos_rp
+
+datos_rp %>%
+  group_by(PROGRAMA) %>%
+  summarise(media = mean(porc_rp)) -> p_rp
+
+# PROGRAMA    media
+# Licenciado  52.0
+# Normalista  52.0
+
 # Process of Inquiry ----
 process_of_inquiry <- dic_creencias %>% 
   filter(subdominio == "Process of Inquiry") %>% 
@@ -201,6 +328,12 @@ qqnorm(datos_pais$process_of_inquiry, las=1, pch=18,
        main="process of inquiry of the teachers", font.main=1,
        xlab="Theoretical quantiles", ylab="Sample quantiles") 
 qqline(datos_pais$process_of_inquiry)
+
+datos_pais %>%
+  filter(PROGRAMA=="Normalista") -> datos_normalista
+
+datos_pais %>%
+  filter(PROGRAMA=="Licenciado") -> datos_licenciado
 
 shapiro.test(datos_normalista$process_of_inquiry)
 # W = 0.96047, p-value = 5.647e-09
@@ -290,6 +423,60 @@ cohen.d(formula = process_of_inquiry ~ PROGRAMA,
         data= datos_pais, paired = FALSE)
 # d estimate: 0.5633947 (medium)
 
+# percentage of process of inquiry ----
+datos_pais %>% 
+  dplyr::select(PROGRAMA, all_of(process_of_inquiry)) %>%
+  mutate(MFD001C_d = ifelse(MFD001C == 6 | MFD001C == 5,1,0),
+         MFD001D_d = ifelse(MFD001D == 6 | MFD001D == 5,1,0),
+         MFD001F_d = ifelse(MFD001F == 6 | MFD001F == 5,1,0),
+         MFD001H_d = ifelse(MFD001H == 6 | MFD001H == 5,1,0),
+         MFD001I_d = ifelse(MFD001I == 6 | MFD001I == 5,1,0),
+         MFD001J_d = ifelse(MFD001J == 6 | MFD001J == 5,1,0)) -> datos_pi
+
+datos_pi %>% 
+  mutate(porc_pi = ((MFD001C_d+MFD001D_d+MFD001F_d+
+                       MFD001H_d+MFD001I_d+MFD001J_d)/6)*100) -> datos_pi
+
+datos_pi %>%
+  group_by(PROGRAMA) %>%
+  summarise(media = mean(porc_pi)) -> p_pi
+
+# PROGRAMA       n media
+# Licenciado   213  60.3
+# Normalista   405  41.0
+
+# graph percentage of rules and process and process of inquiry ----
+graf_porc_rp_pi <- data.frame("Program" = c("Graduaded","Normalist",
+                                             "Graduaded","Normalist"),
+                              "M"=c("Rules and procedures","Rules and procedures",
+                                    "Process of inquiry","Process of inquiry"),
+                              "Porcentaje_promedio" = c(p_rp$media,p_pi$media))
+
+graf_porc_rp_pi$M <- factor(graf_porc_rp_pi$M,
+                            levels = c("Rules and procedures",
+                                       "Process of inquiry"),
+                               ordered = TRUE)
+
+graf_porc_rp_pi %>% 
+  ggplot(., aes(x=M, y=Porcentaje_promedio, fill=Program)) + 
+  geom_col(position="dodge",colour="black",width=0.5)+
+  labs(x= "Mathematics as",
+       y="Average percent of support")+
+  #scale_fill_manual(values = c("#8cc482","#6a9cad"))+
+  scale_fill_manual(values = c("#919191","#dedede"))+
+  annotate("text", label = c("52.03%", "51.98%","60.33%","40.99%"),
+           x = c(0.88,1.15,1.88,2.15),
+           y = c(55,54.5,63,44),
+           size = 5)+
+  scale_y_continuous(limit=c(0,100))+
+  facet_grid(.~ "Nature of mathematics")+
+  theme_bw()+
+  theme(text=element_text(family="Times New Roman",
+                          face="bold",
+                          size=14),
+        axis.text.x  = element_text(face="bold",colour="#000000"))
+
+
 # Teacher Direction ----
 teacher_direction <- dic_creencias %>% 
   filter(subdominio == "Teacher Direction") %>% 
@@ -331,6 +518,12 @@ qqnorm(datos_pais$teacher_direction, las=1, pch=18,
        main="Teacher Direction", font.main=1,
        xlab="Theoretical quantiles", ylab="Sample quantiles") 
 qqline(datos_pais$teacher_direction)
+
+datos_pais %>%
+  filter(PROGRAMA=="Normalista") -> datos_normalista
+
+datos_pais %>%
+  filter(PROGRAMA=="Licenciado") -> datos_licenciado
 
 shapiro.test(datos_normalista$teacher_direction)
 # W = 0.90567, p-value = 3.612e-15
@@ -418,6 +611,31 @@ cohen.d(formula = teacher_direction ~ factor(PROGRAMA),
         data= datos_pais, paired = FALSE)
 # d estimate: 0.1025368 (negligible)
 
+# percentage of teacher direction ----
+datos_pais %>% 
+  dplyr::select(PROGRAMA, all_of(teacher_direction)) %>%
+  mutate(MFD002A_d = ifelse(MFD002A == 6 | MFD002A == 5,1,0),
+         MFD002B_d = ifelse(MFD002B == 6 | MFD002B == 5,1,0),
+         MFD002C_d = ifelse(MFD002C == 6 | MFD002C == 5,1,0),
+         MFD002D_d = ifelse(MFD002D == 6 | MFD002D == 5,1,0),
+         MFD002E_d = ifelse(MFD002E == 6 | MFD002E == 5,1,0),
+         MFD002F_d = ifelse(MFD002F == 6 | MFD002F == 5,1,0),
+         MFD002I_d = ifelse(MFD002I == 6 | MFD002I == 5,1,0),
+         MFD002J_d = ifelse(MFD002J == 6 | MFD002J == 5,1,0)) -> datos_td
+
+datos_td %>% 
+  mutate(porc_td = ((MFD002A_d+MFD002B_d+MFD002C_d+MFD002D_d+
+                     MFD002E_d+MFD002F_d+MFD002I_d+MFD002J_d)/8)*100) -> datos_td
+
+datos_td %>%
+  group_by(PROGRAMA) %>%
+  summarise(media = mean(porc_td)) -> p_td
+
+# PROGRAMA   media
+# Licenciado  17.4
+# Normalista  25.8
+
+
 # Active Learning ----
 active_learning <- dic_creencias %>% 
   filter(subdominio == "Active Learning") %>% 
@@ -459,6 +677,12 @@ qqnorm(datos_pais$active_learning, las=1, pch=18,
        main="Active Learning de los profesores", font.main=1,
        xlab="Theoretical quantiles", ylab="Sample quantiles") 
 qqline(datos_pais$active_learning)
+
+datos_pais %>%
+  filter(PROGRAMA=="Normalista") -> datos_normalista
+
+datos_pais %>%
+  filter(PROGRAMA=="Licenciado") -> datos_licenciado
 
 shapiro.test(datos_normalista$active_learning)
 # W = 0.94281, p-value = 2.211e-11
@@ -544,6 +768,59 @@ cohen.d(formula = active_learning ~ PROGRAMA,
         data= datos_pais, paired = FALSE)
 # d estimate: 0.4822629 (small)
 
+# percentage of active learning ----
+datos_pais %>% 
+  dplyr::select(PROGRAMA, all_of(active_learning)) %>%
+  mutate(MFD002G_d = ifelse(MFD002G == 6 | MFD002G == 5,1,0),
+         MFD002H_d = ifelse(MFD002H == 6 | MFD002H == 5,1,0),
+         MFD002K_d = ifelse(MFD002K == 6 | MFD002K == 5,1,0),
+         MFD002L_d = ifelse(MFD002L == 6 | MFD002L == 5,1,0),
+         MFD002M_d = ifelse(MFD002M == 6 | MFD002M == 5,1,0),
+         MFD002N_d = ifelse(MFD002N == 6 | MFD002N == 5,1,0)) -> datos_al
+
+datos_al %>% 
+  mutate(porc_al = ((MFD002G_d+MFD002H_d+MFD002K_d+MFD002L_d+
+                     MFD002M_d+MFD002N_d)/6)*100) -> datos_al
+
+datos_al %>%
+  group_by(PROGRAMA) %>%
+  summarise(media = mean(porc_al)) -> p_al
+
+# PROGRAMA   media
+# Licenciado  68.6
+# Normalista  48.2
+
+# graph percentage of teacher direction and active learning ----
+graf_porc_td_al <- data.frame("Program" = c("Graduaded","Normalist",
+                                            "Graduaded","Normalist"),
+                              "M"=c("Teacher direction","Teacher direction",
+                                    "Active learning","Active learning"),
+                              "Porcentaje_promedio" = c(p_td$media,p_al$media))
+
+graf_porc_td_al$M <- factor(graf_porc_td_al$M,
+                            levels = c("Teacher direction",
+                                       "Active learning"),
+                            ordered = TRUE)
+
+graf_porc_td_al %>% 
+  ggplot(., aes(x=M, y=Porcentaje_promedio, fill=Program)) + 
+  geom_col(position="dodge",colour="black",width=0.5)+
+  labs(x= "Learning with",
+       y="Average percent of support")+
+  #scale_fill_manual(values = c("#8cc482","#6a9cad"))+
+  scale_fill_manual(values = c("#919191","#dedede"))+
+  annotate("text", label = c("17.43%", "25.83%","68.62%","48.19%"),
+           x = c(0.88,1.15,1.88,2.15),
+           y = c(20,28.5,71,51),
+           size = 5)+
+  scale_y_continuous(limit=c(0,100))+
+  facet_grid(.~ "Learning mathematics")+
+  theme_bw()+
+  theme(text=element_text(family="Times New Roman",
+                          face="bold",
+                          size=14),
+        axis.text.x  = element_text(face="bold",colour="#000000"))
+
 # Fixed Ability ----
 fixed_ability <- dic_creencias %>% 
   filter(subdominio == "Fixed Ability") %>% 
@@ -585,6 +862,12 @@ qqnorm(datos_pais$fixed_ability, las=1, pch=18,
        main="Fixed Ability de los profesores", font.main=1,
        xlab="Theoretical quantiles", ylab="Sample quantiles") 
 qqline(datos_pais$fixed_ability)
+
+datos_pais %>%
+  filter(PROGRAMA=="Normalista") -> datos_normalista
+
+datos_pais %>%
+  filter(PROGRAMA=="Licenciado") -> datos_licenciado
 
 shapiro.test(datos_normalista$fixed_ability)
 # W = 0.92111, p-value = 9.538e-14
@@ -666,6 +949,53 @@ cohen.d(formula = fixed_ability ~ PROGRAMA,
         data= datos_pais, paired = FALSE)
 # d estimate: -0.03043892 (negligible)
 
+# percentage of fixed ability ----
+datos_pais %>% 
+  dplyr::select(PROGRAMA, all_of(fixed_ability)) %>%
+  mutate(MFD003A_d = ifelse(MFD003A == 6 | MFD003A== 5,1,0),
+         MFD003B_d = ifelse(MFD003B == 6 | MFD003B == 5,1,0),
+         MFD003C_d = ifelse(MFD003C == 6 | MFD003C == 5,1,0),
+         MFD003D_d = ifelse(MFD003D == 6 | MFD003D == 5,1,0),
+         MFD003E_d = ifelse(MFD003E == 6 | MFD003E == 5,1,0),
+         MFD003F_d = ifelse(MFD003F == 6 | MFD003F == 5,1,0),
+         MFD003G_d = ifelse(MFD003G == 6 | MFD003G == 5,1,0),
+         MFD003H_d = ifelse(MFD003H == 6 | MFD003H == 5,1,0)) -> datos_fa
+
+datos_fa %>% 
+  mutate(porc_fa = ((MFD003A_d+MFD003B_d+MFD003C_d+MFD003D_d+
+                     MFD003E_d+MFD003F_d+MFD003G_d+MFD003H_d)/8)*100) -> datos_fa
+
+datos_fa %>%
+  group_by(PROGRAMA) %>%
+  summarise(media = mean(porc_fa)) -> p_fa
+
+# PROGRAMA   media
+# Licenciado  16.3
+# Normalista  20.8
+
+# graph percentage of fixed ability ----
+graf_porc_fa <- data.frame("Program" = c("Graduaded","Normalist"),
+                              "M"=c("Fixed ability","Fixed ability"),
+                              "Porcentaje_promedio" = c(p_fa$media))
+
+graf_porc_fa %>% 
+  ggplot(., aes(x="", y=Porcentaje_promedio, fill=Program)) + 
+  geom_col(position="dodge",colour="black",width=0.5)+
+  labs(x= "", y="Average percent of support")+
+  #scale_fill_manual(values = c("#8cc482","#6a9cad"))+
+  scale_fill_manual(values = c("#919191","#dedede"))+
+  annotate("text", label = c("16.3%", "20.8%"),
+           x = c(0.88,1.15),
+           y = c(20,24),
+           size = 5)+
+  scale_y_continuous(limit=c(0,100))+
+  facet_grid(.~ "Fixed ability")+
+  theme_bw()+
+  theme(text=element_text(family="Times New Roman",
+                          face="bold",
+                          size=14),
+        axis.text.x  = element_text(face="bold",colour="#000000"))
+
 # Preparedness for Teaching Mathematics ----
 Prep_for_teach_math <- dic_creencias %>% 
   filter(subdominio == "Preparedness for Teaching Mathematics") %>% 
@@ -707,6 +1037,12 @@ qqnorm(datos_pais$Prep_for_teach_math, las=1, pch=18,
        main="Preparedness for Teaching Mathematics de los profesores", font.main=1,
        xlab="Theoretical quantiles", ylab="Sample quantiles") 
 qqline(datos_pais$Prep_for_teach_math)
+
+datos_pais %>%
+  filter(PROGRAMA=="Normalista") -> datos_normalista
+
+datos_pais %>%
+  filter(PROGRAMA=="Licenciado") -> datos_licenciado
 
 shapiro.test(datos_normalista$Prep_for_teach_math)
 # W = 0.93088, p-value = 9.588e-13
@@ -792,6 +1128,60 @@ cohen.d(formula = Prep_for_teach_math ~ PROGRAMA,
         data= datos_pais, paired = FALSE)
 # d estimate: 0.3333059 (small)
 
+# percentage of Preparedness for Teaching Mathematics ----
+datos_pais %>% 
+  dplyr::select(PROGRAMA, all_of(Prep_for_teach_math)) %>%
+  mutate(MFD004A_d = ifelse(MFD004A == 4 | MFD004A== 3,1,0),
+         MFD004B_d = ifelse(MFD004B == 4 | MFD004B== 3,1,0),
+         MFD004C_d = ifelse(MFD004C == 4 | MFD004C== 3,1,0),
+         MFD004D_d = ifelse(MFD004D == 4 | MFD004D== 3,1,0),
+         MFD004E_d = ifelse(MFD004E == 4 | MFD004E== 3,1,0),
+         MFD004F_d = ifelse(MFD004F == 4 | MFD004F== 3,1,0),
+         MFD004G_d = ifelse(MFD004G == 4 | MFD004G== 3,1,0),
+         MFD004H_d = ifelse(MFD004H == 4 | MFD004H== 3,1,0),
+         MFD004I_d = ifelse(MFD004I == 4 | MFD004I== 3,1,0),
+         MFD004J_d = ifelse(MFD004J == 4 | MFD004J== 3,1,0),
+         MFD004K_d = ifelse(MFD004K == 4 | MFD004K== 3,1,0),
+         MFD004L_d = ifelse(MFD004L == 4 | MFD004L== 3,1,0),
+         MFD004M_d = ifelse(MFD004M == 4 | MFD004M== 3,1,0)) -> datos_pftm
+
+datos_pftm %>% 
+  mutate(porc_pftm = ((MFD004A_d+MFD004B_d+MFD004C_d+MFD004D_d+MFD004E_d+
+                       MFD004F_d+MFD004G_d+MFD004H_d+MFD004I_d+MFD004J_d+
+                       MFD004K_d+MFD004L_d+MFD004M_d)/13)*100) -> datos_pftm
+
+datos_pftm %>%
+  group_by(PROGRAMA) %>%
+  summarise(media = mean(porc_pftm)) -> p_pftm
+
+# PROGRAMA   media
+# Licenciado  81.2
+# Normalista  63.6
+
+# graph percentage of Preparedness for Teaching Mathematics ----
+graf_porc_pftm <- data.frame("Program" = c("Graduaded","Normalist"),
+                           "M"=c("Preparedness for teaching mathematics",
+                                 "Preparedness for teaching mathematics"),
+                           "Porcentaje_promedio" = c(p_pftm$media))
+
+graf_porc_pftm %>% 
+  ggplot(., aes(x="", y=Porcentaje_promedio, fill=Program)) + 
+  geom_col(position="dodge",colour="black",width=0.5)+
+  labs(x= "", y="Average percent of support")+
+  #scale_fill_manual(values = c("#8cc482","#6a9cad"))+
+  scale_fill_manual(values = c("#919191","#dedede"))+
+  annotate("text", label = c("81.2%", "63.6%"),
+           x = c(0.88,1.15),
+           y = c(84.2,66.6),
+           size = 5)+
+  scale_y_continuous(limit=c(0,100))+
+  facet_grid(.~ "Preparedness for teaching mathematics")+
+  theme_bw()+
+  theme(text=element_text(family="Times New Roman",
+                          face="bold",
+                          size=14),
+        axis.text.x  = element_text(face="bold",colour="#000000"))
+
 # Quality of Instruction ----
 quality_of_instr <- dic_creencias %>% 
   filter(subdominio == "Quality of Instruction") %>% 
@@ -833,6 +1223,12 @@ qqnorm(datos_pais$quality_of_instr, las=1, pch=18,
        main="Quality of Instruction de los profesores", font.main=1,
        xlab="Theoretical quantiles", ylab="Sample quantiles") 
 qqline(datos_pais$quality_of_instr)
+
+datos_pais %>%
+  filter(PROGRAMA=="Normalista") -> datos_normalista
+
+datos_pais %>%
+  filter(PROGRAMA=="Licenciado") -> datos_licenciado
 
 shapiro.test(datos_normalista$quality_of_instr)
 # W = 0.93809, p-value = 6.093e-12
@@ -916,3 +1312,50 @@ t.test(x = datos_licenciado$quality_of_instr,
 cohen.d(formula = quality_of_instr ~ PROGRAMA,
         data= datos_pais, paired = FALSE)
 # d estimate: 0.1125414 (negligible)
+
+# percentage of Quality of instruction ----
+datos_pais %>% 
+  dplyr::select(PROGRAMA, all_of(quality_of_instr)) %>%
+  mutate(MFD005A_d = ifelse(MFD005A == 6 | MFD005A== 5,1,0),
+         MFD005B_d = ifelse(MFD005B == 6 | MFD005B== 5,1,0),
+         MFD005C_d = ifelse(MFD005C == 6 | MFD005C== 5,1,0),
+         MFD005D_d = ifelse(MFD005D == 6 | MFD005D== 5,1,0),
+         MFD005E_d = ifelse(MFD005E == 6 | MFD005E== 5,1,0),
+         MFD005F_d = ifelse(MFD005F == 6 | MFD005F== 5,1,0)) -> datos_qi
+
+datos_qi %>% 
+  mutate(porc_qi = ((MFD005A_d+MFD005B_d+MFD005C_d+
+                     MFD005D_d+MFD005E_d+MFD005F_d)/6)*100) -> datos_qi
+
+datos_qi %>%
+  group_by(PROGRAMA) %>%
+  summarise(media = mean(porc_qi)) -> p_qi
+
+# PROGRAMA   media
+# Licenciado  49.6
+# Normalista  49.8
+
+# graph percentage of Quality of instruction ----
+graf_porc_qi <- data.frame("Program" = c("Graduaded","Normalist"),
+                             "M"=c("Quality of instruction",
+                                   "Quality of instruction"),
+                             "Porcentaje_promedio" = c(p_qi$media))
+
+graf_porc_qi %>% 
+  ggplot(., aes(x="", y=Porcentaje_promedio, fill=Program)) + 
+  geom_col(position="dodge",colour="black",width=0.5)+
+  labs(x="", y="Average percent of support")+
+  #scale_fill_manual(values = c("#8cc482","#6a9cad"))+
+  scale_fill_manual(values = c("#919191","#dedede"))+
+  annotate("text", label = c("49.6%", "49.8%"),
+           x = c(0.88,1.15),
+           y = c(53,53.5),
+           size = 5)+
+  scale_y_continuous(limit=c(0,100))+
+  facet_grid(.~ "Quality of instruction")+
+  theme_bw()+
+  theme(text=element_text(family="Times New Roman",
+                          face="bold",
+                          size=14),
+        axis.text.x  = element_text(face="bold",colour="#000000"))
+                      
