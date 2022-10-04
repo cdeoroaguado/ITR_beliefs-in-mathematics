@@ -1139,6 +1139,12 @@ datos_pais %>%
             minimo = min(MFD004A),
             maximo = max(MFD004A))
 
+datos_pais %>%
+  select(PROGRAMA,MFD004A)%>%
+  group_by(MFD004A)%>%
+  summarise(n = length(MFD004A),
+            porc=(length(MFD004A)/618)*100)
+
 mfd004a<- table(datos_pais$MFD004A,datos_pais$PROGRAMA)
 chisq.test(mfd004a)
 Pmfd004al<-(mfd004a[,1]/sum(mfd004a[,1]))*100
@@ -1170,6 +1176,12 @@ datos_pais %>%
             minimo = min(MFD004B),
             maximo = max(MFD004B))
 
+datos_pais %>%
+  select(PROGRAMA,MFD004B)%>%
+  group_by(MFD004B)%>%
+  summarise(n = length(MFD004B),
+            porc=(length(MFD004B)/618)*100)
+
 mfd004b<- table(datos_pais$MFD004B,datos_pais$PROGRAMA)
 chisq.test(mfd004b)
 Pmfd004bl<-(mfd004b[,1]/sum(mfd004b[,1]))*100
@@ -1191,6 +1203,7 @@ r4B
 interpret_r(r4B$r_rank_biserial, rules = "cohen")
 
 # "MFD004C" 
+
 datos_pais %>%
   select(PROGRAMA,MFD004C) %>%
   group_by(PROGRAMA) %>%
@@ -1200,6 +1213,12 @@ datos_pais %>%
             median = median(MFD004C),
             minimo = min(MFD004C),
             maximo = max(MFD004C))
+
+datos_pais %>%
+  select(PROGRAMA,MFD004C)%>%
+  group_by(MFD004C)%>%
+  summarise(n = length(MFD004C),
+            porc=(length(MFD004C)/618)*100)
 
 mfd004c<- table(datos_pais$MFD004C,datos_pais$PROGRAMA)
 chisq.test(mfd004c)
@@ -1232,6 +1251,12 @@ datos_pais %>%
             minimo = min(MFD004D),
             maximo = max(MFD004D))
 
+datos_pais %>%
+  select(PROGRAMA,MFD004D)%>%
+  group_by(MFD004D)%>%
+  summarise(n = length(MFD004D),
+            porc=(length(MFD004D)/618)*100)
+
 mfd004d<- table(datos_pais$MFD004D,datos_pais$PROGRAMA)
 chisq.test(mfd004d)
 Pmfd004dl<-(mfd004d[,1]/sum(mfd004d[,1]))*100
@@ -1262,6 +1287,12 @@ datos_pais %>%
             median = median(MFD004E),
             minimo = min(MFD004E),
             maximo = max(MFD004E))
+
+datos_pais %>%
+  select(PROGRAMA,MFD004E)%>%
+  group_by(MFD004E)%>%
+  summarise(n = length(MFD004E),
+            porc=(length(MFD004E)/618)*100)
 
 mfd004e<- table(datos_pais$MFD004E,datos_pais$PROGRAMA)
 chisq.test(mfd004e)
@@ -1294,6 +1325,12 @@ datos_pais %>%
             minimo = min(MFD004F),
             maximo = max(MFD004F))
 
+datos_pais %>%
+  select(PROGRAMA,MFD004F)%>%
+  group_by(MFD004F)%>%
+  summarise(n = length(MFD004F),
+            porc=(length(MFD004F)/618)*100)
+
 mfd004f<- table(datos_pais$MFD004F,datos_pais$PROGRAMA)
 chisq.test(mfd004f)
 Pmfd004fl<-(mfd004f[,1]/sum(mfd004f[,1]))*100
@@ -1324,6 +1361,12 @@ datos_pais %>%
             median = median(MFD004G),
             minimo = min(MFD004G),
             maximo = max(MFD004G))
+
+datos_pais %>%
+  select(PROGRAMA,MFD004G)%>%
+  group_by(MFD004G)%>%
+  summarise(n = length(MFD004G),
+            porc=(length(MFD004G)/618)*100)
 
 mfd004g<- table(datos_pais$MFD004G,datos_pais$PROGRAMA)
 chisq.test(mfd004g)
@@ -1356,6 +1399,12 @@ datos_pais %>%
             minimo = min(MFD004H),
             maximo = max(MFD004H))
 
+datos_pais %>%
+  select(PROGRAMA,MFD004H)%>%
+  group_by(MFD004H)%>%
+  summarise(n = length(MFD004H),
+            porc=(length(MFD004H)/618)*100)
+
 mfd004h<- table(datos_pais$MFD004H,datos_pais$PROGRAMA)
 chisq.test(mfd004h)
 Pmfd004hl<-(mfd004h[,1]/sum(mfd004h[,1]))*100
@@ -1386,6 +1435,12 @@ datos_pais %>%
             median = median(MFD004I),
             minimo = min(MFD004I),
             maximo = max(MFD004I))
+
+datos_pais %>%
+  select(PROGRAMA,MFD004I)%>%
+  group_by(MFD004I)%>%
+  summarise(n = length(MFD004I),
+            porc=(length(MFD004I)/618)*100)
 
 mfd004i<- table(datos_pais$MFD004I,datos_pais$PROGRAMA)
 chisq.test(mfd004i)
