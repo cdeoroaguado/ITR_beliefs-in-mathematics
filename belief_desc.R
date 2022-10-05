@@ -8,11 +8,11 @@ library(effectsize)
 library(car)
 
 # Data reading ----
-datos_pais <- read_excel("~/Doc_Evelyn/itr_creencias/Datos_TEDS_M_Colombia.xlsx",
+datos_pais <- read_excel("GitHub/ITR_beliefs-in-mathematics/Datos_TEDS_M_Colombia.xlsx",
                          sheet = "bd_Norm_Licen")
 
   
-dic_creencias <- read_excel("~/Doc_Evelyn/itr_creencias/Datos_TEDS_M_Colombia.xlsx",
+dic_creencias <- read_excel("GitHub/ITR_beliefs-in-mathematics/Datos_TEDS_M_Colombia.xlsx",
                             sheet = "dic")
 
 # subset data ----
@@ -22,6 +22,108 @@ datos_pais %>%
 datos_pais %>%
   filter(PROGRAMA=="Licenciado") -> datos_licenciado
 
+# transformaciones de datos ----
+dic_creencias %>% 
+  filter(subdominio == "Rules and Procedures") %>% 
+  dplyr::select(idi) %>% 
+  pull(idi) %>% 
+  as.character()
+
+creencias <- datos_pais %>%
+  dplyr::select(PROGRAMA,MFD001A,MFD001B,MFD001E,MFD001G,MFD001K,MFD001L,
+                MFD001C,MFD001D,MFD001F,MFD001H,MFD001I,MFD001J,
+                MFD002A,MFD002B,MFD002C,MFD002D,MFD002E,MFD002F,MFD002I,
+                MFD002J,MFD002G,MFD002H,MFD002K,MFD002L,MFD002M,MFD002N,
+                MFD003A,MFD003B,MFD003C,MFD003D,MFD003E,MFD003F,MFD003G,
+                MFD003H,MFD004A,MFD004B,MFD004C,MFD004D,MFD004E,MFD004F,MFD004G,
+                MFD004H,MFD004I,MFD004J,MFD004K,MFD004L,MFD004M,
+                MFD005A,MFD005B,MFD005C,MFD005D,MFD005E,MFD005F) %>%
+  mutate(Rules_and_Procedures = ((MFD001A+MFD001B+MFD001E
+                                  +MFD001G+MFD001K+MFD001L)/6),
+         Process_of_Inquiry = ((MFD001C+MFD001D+MFD001F+
+                        MFD001H+MFD001I+MFD001J)/6),
+         Teacher_Direction = ((MFD002A+MFD002B+MFD002C+MFD002D+MFD002E+
+                               MFD002F+MFD002I+MFD002J)/8),
+         Active_Learning = ((MFD002G+MFD002H+MFD002K+MFD002L+MFD002M+MFD002N)/6),
+         Fixed_Ability = ((MFD003A+MFD003B+MFD003C+MFD003D+MFD003E+MFD003F+MFD003G+
+                           MFD003H)/8),
+         Preparedness_for_Tea_Mat = ((MFD004A+MFD004B+MFD004C+MFD004D+MFD004E+MFD004F+MFD004G+
+                                      MFD004H+MFD004I+MFD004J+MFD004K+MFD004L+MFD004M)/13),
+         Quality_of_Instruction = ((MFD005A+MFD005B+MFD005C+MFD005D+MFD005E+MFD005F)/6)) 
+
+
+# subset data ----
+creencias %>%
+  filter(PROGRAMA=="Normalista") -> c_normalista
+
+creencias %>%
+  filter(PROGRAMA=="Licenciado") -> c_licenciado
+
+# Rules_and_Procedures total ----
+creencias %>%
+  summarise(n = length(Rules_and_Procedures),
+            media= mean(Rules_and_Procedures),
+            sd = sd(Rules_and_Procedures),
+            median = median(Rules_and_Procedures),
+            min = min(Rules_and_Procedures),
+            max = max(Rules_and_Procedures),
+            riq = IQR(Rules_and_Procedures))
+
+creencias %>%
+  group_by(PROGRAMA) %>%
+  summarise(n = length(Rules_and_Procedures),
+            media= mean(Rules_and_Procedures),
+            sd = sd(Rules_and_Procedures),
+            median = median(Rules_and_Procedures),
+            min = min(Rules_and_Procedures),
+            max = max(Rules_and_Procedures),
+            riq = IQR(Rules_and_Procedures))
+
+# non-parametric test
+wilcox.test(c_normalista$Rules_and_Procedures,
+            c_licenciado$Rules_and_Procedures,paired = F,
+            exact = F,correct = T,conf.int = 0.95)
+
+# effect size non-parametric 
+r1A <- rank_biserial(c_normalista$Rules_and_Procedures,
+                     c_licenciado$Rules_and_Procedures)
+
+r1A
+
+interpret_r(r1A$r_rank_biserial, rules = "cohen")
+
+# Process of Inquiry total ----
+creencias %>%
+  summarise(n = length(Process_of_Inquiry),
+            media= mean(Process_of_Inquiry),
+            sd = sd(Process_of_Inquiry),
+            median = median(Process_of_Inquiry),
+            min = min(Process_of_Inquiry),
+            max = max(Process_of_Inquiry),
+            riq = IQR(Process_of_Inquiry))
+
+creencias %>%
+  group_by(PROGRAMA) %>%
+  summarise(n = length(Process_of_Inquiry),
+            media= mean(Process_of_Inquiry),
+            sd = sd(Process_of_Inquiry),
+            median = median(Process_of_Inquiry),
+            min = min(Process_of_Inquiry),
+            max = max(Process_of_Inquiry),
+            riq = IQR(Process_of_Inquiry))
+
+# non-parametric test
+wilcox.test(c_normalista$Process_of_Inquiry,
+            c_licenciado$Process_of_Inquiry,paired = F,
+            exact = F,correct = T,conf.int = 0.95)
+
+# effect size non-parametric 
+r1A <- rank_biserial(c_normalista$Process_of_Inquiry,
+                     c_licenciado$Process_of_Inquiry)
+
+r1A
+
+interpret_r(r1A$r_rank_biserial, rules = "cohen")
 # age ----
 datos_pais %>%
   summarise(n = length(MFA001),
@@ -1473,6 +1575,12 @@ datos_pais %>%
             minimo = min(MFD004J),
             maximo = max(MFD004J))
 
+datos_pais %>%
+  select(PROGRAMA,MFD004I)%>%
+  group_by(MFD004I)%>%
+  summarise(n = length(MFD004I),
+            porc=(length(MFD004I)/618)*100)
+
 mfd004j<- table(datos_pais$MFD004J,datos_pais$PROGRAMA)
 chisq.test(mfd004j)
 Pmfd004jl<-(mfd004j[,1]/sum(mfd004j[,1]))*100
@@ -1504,6 +1612,12 @@ datos_pais %>%
             minimo = min(MFD004K),
             maximo = max(MFD004K))
 
+datos_pais %>%
+  select(PROGRAMA,MFD004K)%>%
+  group_by(MFD004K)%>%
+  summarise(n = length(MFD004K),
+            porc=(length(MFD004K)/618)*100)
+
 mfd004k<- table(datos_pais$MFD004K,datos_pais$PROGRAMA)
 chisq.test(mfd004k)
 Pmfd004kl<-(mfd004k[,1]/sum(mfd004k[,1]))*100
@@ -1534,6 +1648,12 @@ datos_pais %>%
             median = median(MFD004L),
             minimo = min(MFD004L),
             maximo = max(MFD004L))
+
+datos_pais %>%
+  select(PROGRAMA,MFD004L)%>%
+  group_by(MFD004L)%>%
+  summarise(n = length(MFD004L),
+            porc=(length(MFD004L)/618)*100)
 
 mfd004l<- table(datos_pais$MFD004L,datos_pais$PROGRAMA)
 chisq.test(mfd004l)
