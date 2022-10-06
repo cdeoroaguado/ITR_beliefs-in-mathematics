@@ -8,11 +8,11 @@ library(effectsize)
 library(car)
 
 # Data reading ----
-datos_pais <- read_excel("GitHub/ITR_beliefs-in-mathematics/Datos_TEDS_M_Colombia.xlsx",
+datos_pais <- read_excel("Datos_TEDS_M_Colombia.xlsx",
                          sheet = "bd_Norm_Licen")
 
   
-dic_creencias <- read_excel("GitHub/ITR_beliefs-in-mathematics/Datos_TEDS_M_Colombia.xlsx",
+dic_creencias <- read_excel("Datos_TEDS_M_Colombia.xlsx",
                             sheet = "dic")
 
 # subset data ----
@@ -90,8 +90,6 @@ r1A <- rank_biserial(c_normalista$Rules_and_Procedures,
 
 r1A
 
-interpret_r(r1A$r_rank_biserial, rules = "cohen")
-
 # Process of Inquiry total ----
 creencias %>%
   summarise(n = length(Process_of_Inquiry),
@@ -123,7 +121,161 @@ r1A <- rank_biserial(c_normalista$Process_of_Inquiry,
 
 r1A
 
-interpret_r(r1A$r_rank_biserial, rules = "cohen")
+# Teacher Direction total ----
+creencias %>%
+  summarise(n = length(Teacher_Direction),
+            media= mean(Teacher_Direction),
+            sd = sd(Teacher_Direction),
+            median = median(Teacher_Direction),
+            min = min(Teacher_Direction),
+            max = max(Teacher_Direction),
+            riq = IQR(Teacher_Direction))
+
+creencias %>%
+  group_by(PROGRAMA) %>%
+  summarise(n = length(Teacher_Direction),
+            media= mean(Teacher_Direction),
+            sd = sd(Teacher_Direction),
+            median = median(Teacher_Direction),
+            min = min(Teacher_Direction),
+            max = max(Teacher_Direction),
+            riq = IQR(Teacher_Direction))
+
+# non-parametric test
+wilcox.test(c_normalista$Teacher_Direction,
+            c_licenciado$Teacher_Direction,paired = F,
+            exact = F,correct = T,conf.int = 0.95)
+
+# effect size non-parametric 
+r1A <- rank_biserial(c_normalista$Teacher_Direction,
+                     c_licenciado$Teacher_Direction)
+
+r1A
+
+# Active Learning total ----
+creencias %>%
+  summarise(n = length(Active_Learning),
+            media= mean(Active_Learning),
+            sd = sd(Active_Learning),
+            median = median(Active_Learning),
+            min = min(Active_Learning),
+            max = max(Active_Learning),
+            riq = IQR(Active_Learning))
+
+creencias %>%
+  group_by(PROGRAMA) %>%
+  summarise(n = length(Active_Learning),
+            media= mean(Active_Learning),
+            sd = sd(Active_Learning),
+            median = median(Active_Learning),
+            min = min(Active_Learning),
+            max = max(Active_Learning),
+            riq = IQR(Active_Learning))
+
+# non-parametric test
+wilcox.test(c_normalista$Active_Learning,
+            c_licenciado$Active_Learning,paired = F,
+            exact = F,correct = T,conf.int = 0.95)
+
+# effect size non-parametric 
+r1A <- rank_biserial(c_normalista$Active_Learning,
+                     c_licenciado$Active_Learning)
+
+r1A
+
+# Fixed Ability total ----
+creencias %>%
+  summarise(n = length(Fixed_Ability),
+            media= mean(Fixed_Ability),
+            sd = sd(Fixed_Ability),
+            median = median(Fixed_Ability),
+            min = min(Fixed_Ability),
+            max = max(Fixed_Ability),
+            riq = IQR(Fixed_Ability))
+
+creencias %>%
+  group_by(PROGRAMA) %>%
+  summarise(n = length(Fixed_Ability),
+            media= mean(Fixed_Ability),
+            sd = sd(Fixed_Ability),
+            median = median(Fixed_Ability),
+            min = min(Fixed_Ability),
+            max = max(Fixed_Ability),
+            riq = IQR(Fixed_Ability))
+
+# non-parametric test
+wilcox.test(c_normalista$Fixed_Ability,
+            c_licenciado$Fixed_Ability,paired = F,
+            exact = F,correct = T,conf.int = 0.95)
+
+# effect size non-parametric 
+r1A <- rank_biserial(c_normalista$Fixed_Ability,
+                     c_licenciado$Fixed_Ability)
+
+r1A
+
+# Quality of Instruction total ----
+creencias %>%
+  summarise(n = length(Quality_of_Instruction),
+            media= mean(Quality_of_Instruction),
+            sd = sd(Quality_of_Instruction),
+            median = median(Quality_of_Instruction),
+            min = min(Quality_of_Instruction),
+            max = max(Quality_of_Instruction),
+            riq = IQR(Quality_of_Instruction))
+
+creencias %>%
+  group_by(PROGRAMA) %>%
+  summarise(n = length(Quality_of_Instruction),
+            media= mean(Quality_of_Instruction),
+            sd = sd(Quality_of_Instruction),
+            median = median(Quality_of_Instruction),
+            min = min(Quality_of_Instruction),
+            max = max(Quality_of_Instruction),
+            riq = IQR(Quality_of_Instruction))
+
+# non-parametric test
+wilcox.test(c_normalista$Quality_of_Instruction,
+            c_licenciado$Quality_of_Instruction,paired = F,
+            exact = F,correct = T,conf.int = 0.95)
+
+# effect size non-parametric 
+r1A <- rank_biserial(c_normalista$Quality_of_Instruction,
+                     c_licenciado$Quality_of_Instruction)
+
+r1A
+
+# Preparedness for Tea Mat total ----
+creencias %>%
+  summarise(n = length(Preparedness_for_Tea_Mat),
+            media= mean(Preparedness_for_Tea_Mat),
+            sd = sd(Preparedness_for_Tea_Mat),
+            median = median(Preparedness_for_Tea_Mat),
+            min = min(Preparedness_for_Tea_Mat),
+            max = max(Preparedness_for_Tea_Mat),
+            riq = IQR(Preparedness_for_Tea_Mat))
+
+creencias %>%
+  group_by(PROGRAMA) %>%
+  summarise(n = length(Preparedness_for_Tea_Mat),
+            media= mean(Preparedness_for_Tea_Mat),
+            sd = sd(Preparedness_for_Tea_Mat),
+            median = median(Preparedness_for_Tea_Mat),
+            min = min(Preparedness_for_Tea_Mat),
+            max = max(Preparedness_for_Tea_Mat),
+            riq = IQR(Preparedness_for_Tea_Mat))
+
+# non-parametric test
+wilcox.test(c_normalista$Preparedness_for_Tea_Mat,
+            c_licenciado$Preparedness_for_Tea_Mat,paired = F,
+            exact = F,correct = T,conf.int = 0.95)
+
+# effect size non-parametric 
+r1A <- rank_biserial(c_normalista$Preparedness_for_Tea_Mat,
+                     c_licenciado$Preparedness_for_Tea_Mat)
+
+r1A
+
 # age ----
 datos_pais %>%
   summarise(n = length(MFA001),
