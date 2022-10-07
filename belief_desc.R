@@ -51,8 +51,7 @@ creencias <- datos_pais %>%
                                       MFD004H+MFD004I+MFD004J+MFD004K+MFD004L+MFD004M)/13),
          Quality_of_Instruction = ((MFD005A+MFD005B+MFD005C+MFD005D+MFD005E+MFD005F)/6)) 
 
-
-# subset data ----
+# subset data para creencias ----
 creencias %>%
   filter(PROGRAMA=="Normalista") -> c_normalista
 
