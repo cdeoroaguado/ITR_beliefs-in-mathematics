@@ -1,6 +1,5 @@
 # packages -----
 library(tidyverse)
-library(mirt)
 library(readxl)
 library(nortest)
 library(effsize)
@@ -8,12 +7,9 @@ library(effectsize)
 library(car)
 
 # Data reading ----
-datos_pais <- read_excel("Datos_TEDS_M_Colombia.xlsx",
-                         sheet = "bd_Norm_Licen")
-
+datos_pais <-  read_excel("Datos_TEDS_M_Colombia.xlsx", sheet = "bd_Norm_Licen")
   
-dic_creencias <- read_excel("Datos_TEDS_M_Colombia.xlsx",
-                            sheet = "dic")
+dic_creencias <- read_excel("Datos_TEDS_M_Colombia.xlsx",sheet = "dic")
 
 # subset data ----
 datos_pais %>%
